@@ -1,0 +1,25 @@
+# Node.js dependencies
+node_modules/
+
+# Environment files
+env/
+
+# IDE / editor specific files
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+
+# Aider cache and history
+.aider*
+.aider.tags.cache.v4/
+.aider.chat.history.md
+.aider.chat.history
+
+
+# Miscellaneous
+*.env
+*.env.*
+
+/src/Secrets.md
