@@ -1,5 +1,7 @@
 {
     "Hard Skills": [
+        "Git",
+        "Github",
         "Python",
         "C",
         "JavaScript",
@@ -10,9 +12,13 @@
         "Electronics",
         "HTML",
         "Robotics",
-        "SQL (basic)",
-        "ML (basic)",
-        "Automation (basic)"
+        "SQL",
+        "ML",
+        "Machine learning",
+        "Computer vision",
+        "APIs",
+        "Automation",
+        "Web development"
     ],
     "Soft Skills": [
         "Problem-solving",
@@ -21,6 +27,11 @@
         "Versatility",
         "Curiosity",
         "Pragmatism"
+    ],
+    "Languages": [
+        {"Spanish": "C2"},
+        {"English": "B2"}
+
     ],
     "Proyects": [
         {

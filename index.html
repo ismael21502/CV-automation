@@ -122,14 +122,14 @@ header {
 <div class="cv">
 
 <header>
-    <div class="name">Juan Pérez</div>
-    <div class="title">Software Developer</div>
+    <div class="name">{{ name }}</div>
+    <div class="title">{{ title }}</div>
 
     <div class="contact">
-        Guadalajara, Jalisco ·
-        +52 33 1234 5678 ·
-        juan@email.com ·
-        github.com/juanperez
+        {{ location }} &middot;
+        {{ phone }} &middot;
+        {{ email }} &middot;
+        {{ github }}
     </div>
 </header>
 
@@ -138,74 +138,57 @@ header {
     <div class="divider"></div>
 
     <p>
-        Ingeniero en Robótica con experiencia en desarrollo de software,
-        aplicaciones web y sistemas embebidos. Interesado en desarrollo
-        backend, automatización y herramientas de productividad.
+        {{ profile }}
     </p>
 </section>
+
 <section class="section">
     <div class="section-title">Habilidades</div>
     <div class="divider"></div>
 
     <div class="skills">
-        <div class="skill">Python</div>
-        <div class="skill">React</div>
-        <div class="skill">Django</div>
-        <div class="skill">ESP32</div>
-        <div class="skill">SQL</div>
-        <div class="skill">Git</div>
-        <div class="skill">MATLAB</div>
-        <div class="skill">Unity</div>
+        {% for skill in skills %}
+        <div class="skill">{{ skill }}</div>
+        {% endfor %}
     </div>
 </section>
+
 <section class="section">
     <div class="section-title">Experiencia</div>
     <div class="divider"></div>
 
+    {% for job in experience %}
     <div class="job">
         <div class="job-header">
-            <span class="company">Boat Rental Management System</span>
-            <span class="dates">2025 - Actual</span>
+            <span class="company">{{ job.company }}</span>
+            <span class="dates">{{ job.dates }}</span>
         </div>
 
         <ul>
-            <li>Desarrollo de sistema de administración para renta de embarcaciones.</li>
-            <li>Dashboard para monitoreo de flota activa, en uso e inactiva.</li>
-            <li>Registro de historial de servicios y mantenimiento.</li>
-            <li>Implementación usando React y almacenamiento local.</li>
+            {% for item in job.responsibilities %}
+            <li>{{ item }}</li>
+            {% endfor %}
         </ul>
     </div>
-
-    <div class="job">
-        <div class="job-header">
-            <span class="company">Proyecto Personal de Recetas</span>
-            <span class="dates">2024 - 2025</span>
-        </div>
-
-        <ul>
-            <li>Aplicación de escritorio para gestión de recetas e ingredientes.</li>
-            <li>Control automático de inventario.</li>
-            <li>Desarrollada en Python utilizando Flet.</li>
-        </ul>
-    </div>
+    {% endfor %}
 </section>
 
 <section class="section">
     <div class="section-title">Educación</div>
     <div class="divider"></div>
 
+    {% for edu in education %}
     <div class="education-item">
         <div class="degree">
-            Ingeniería en software
+            {{ edu.degree }}
         </div>
 
         <div>
-            Universidad · Egresado
+            {{ edu.institution }} &middot; {{ edu.status }}
         </div>
     </div>
+    {% endfor %}
 </section>
-
-
 
 </div>
 
