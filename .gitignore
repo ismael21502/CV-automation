@@ -23,3 +23,7 @@ env/
 *.env.*
 
 /src/Secrets.md
+
+/src/__pycache__/
+Ismael_Hernandez_CV.pdf
+cv.pdf

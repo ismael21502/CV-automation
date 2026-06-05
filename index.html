@@ -1,196 +1,302 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<title>CV</title>
+    <meta charset="UTF-8">
+    <title>CV</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@page {
-    size: Letter;
-    margin: 0;
-}
+        @page {
+            size: Letter;
+            margin: 0;
+        }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #e9e9e9;
-}
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: #ececec;
+            color: #222;
+        }
 
-.cv {
-    width: 216mm;
-    min-height: 279mm;
-    margin: auto;
-    background: white;
-    padding: 18mm;
-}
+        .cv {
+            width: 216mm;
+            min-height: 279mm;
+            margin: auto;
+            background: white;
+            padding: 12mm 16mm;
+        }
 
-header {
-    margin-bottom: 25px;
-}
+        /* ---------- HEADER ---------- */
 
-.name {
-    font-size: 24pt;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
+        header {
+            margin-bottom: 24px;
+        }
 
-.title {
-    font-size: 16pt;
-    color: #555;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
+        .name {
+            font-size: 30pt;
+            font-weight: 800;
+            color: #111;
+            line-height: 1;
+        }
 
-.contact {
-    margin-top: 10px;
-    font-size: 12pt;
-}
+        .title {
+            margin-top: 6px;
+            font-size: 13pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #666;
+        }
 
-.section {
-    margin-top: 25px;
-}
+        .contact {
+            margin-top: 14px;
+            font-size: 11pt;
+            color: #555;
+            line-height: 1.6;
+        }
 
-.section-title {
-    font-size: 14pt;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
+        /* ---------- SECTIONS ---------- */
 
-.divider {
-    border-bottom: 2px solid #444;
-    margin-bottom: 15px;
-}
+        .section {
+            margin-top: 20px;
+        }
 
-.job {
-    margin-bottom: 18px;
-}
+        .section-title {
+            font-size: 12pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #111;
+            margin-bottom: 6px;
+        }
 
-.job-header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
+        .divider {
+            border-bottom: 1px solid #e3e3e3;
+            margin-bottom: 6px;
+        }
 
-.company {
-    font-size: 12pt;
-}
+        /* ---------- SUMMARY ---------- */
 
-.dates {
-    font-size: 10pt;
-}
+        .summary {
+            line-height: 1.6;
+            font-size: 11.5pt;
+            color: #333;
+        }
 
-.job ul {
-    padding-left: 22px;
-}
+        /* ---------- SKILLS ---------- */
 
-.job li {
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
 
-.education-item {
-    margin-bottom: 12px;
-}
+        .skill {
+            background: #f4f4f4;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 10.5pt;
+            color: #333;
+        }
 
-.degree {
-    font-weight: bold;
-}
+        /* ---------- PROJECTS ---------- */
 
-.skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
+        .job {
+            margin-bottom: 18px;
+        }
 
-.skill {
-    border: 1px solid #888;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 10pt;
-}
-</style>
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .company {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .dates {
+            font-size: 10pt;
+            color: #777;
+            white-space: nowrap;
+        }
+
+        .job ul {
+            padding-left: 18px;
+        }
+
+        .job li {
+            margin-bottom: 4px;
+            line-height: 1.5;
+            font-size: 11pt;
+        }
+
+        /* ---------- EDUCATION ---------- */
+
+        .education-item {
+            margin-bottom: 14px;
+        }
+
+        .degree {
+            font-weight: 700;
+            font-size: 11.5pt;
+            color: #111;
+            margin-bottom: 4px;
+        }
+
+        .education-info {
+            color: #555;
+            font-size: 11pt;
+        }
+
+        /* ---------- SOFT SKILLS ---------- */
+
+        .soft-skills {
+            line-height: 1.6;
+            color: #444;
+            font-size: 11pt;
+        }
+    </style>
+
 </head>
 
 <body>
 
-<div class="cv">
+    <div class="cv">
 
-<header>
-    <div class="name">{{ name }}</div>
-    <div class="title">{{ title }}</div>
+        <header>
 
-    <div class="contact">
-        {{ location }} &middot;
-        {{ phone }} &middot;
-        {{ email }} &middot;
-        {{ github }}
-    </div>
-</header>
+            <div class="name">{{ name }}</div>
 
-<section class="section">
-    <div class="section-title">Perfil</div>
-    <div class="divider"></div>
+            <div class="title">
+                {{ title }}
+            </div>
 
-    <p>
-        {{ profile }}
-    </p>
-</section>
+            <div class="contact">
+                {{ location }} &middot;
+                {{ phone }} &middot;
+                {{ email }} &middot;
+                {{ github }}
+            </div>
 
-<section class="section">
-    <div class="section-title">Habilidades</div>
-    <div class="divider"></div>
+        </header>
 
-    <div class="skills">
-        {% for skill in skills %}
-        <div class="skill">{{ skill }}</div>
-        {% endfor %}
-    </div>
-</section>
+        <section class="section">
 
-<section class="section">
-    <div class="section-title">Experiencia</div>
-    <div class="divider"></div>
+            <div class="section-title">
+                Summary
+            </div>
 
-    {% for job in experience %}
-    <div class="job">
-        <div class="job-header">
-            <span class="company">{{ job.company }}</span>
-            <span class="dates">{{ job.dates }}</span>
-        </div>
+            <div class="divider"></div>
 
-        <ul>
-            {% for item in job.responsibilities %}
-            <li>{{ item }}</li>
+            <div class="summary">
+                {{ profile }}
+            </div>
+
+        </section>
+
+        <section class="section">
+
+            <div class="section-title">
+                Hard Skills
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="skills">
+                {% for skill in skills %}
+                <div class="skill">
+                    {{ skill }}
+                </div>
+                {% endfor %}
+            </div>
+
+        </section>
+
+        <section class="section">
+
+            <div class="section-title">
+                Soft Skills
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="soft-skills">
+                {{ softSkills | join(', ') }}
+            </div>
+
+        </section>
+
+        <section class="section">
+
+            <div class="section-title">
+                Relevant Projects
+            </div>
+
+            <div class="divider"></div>
+
+            {% for job in experience %}
+            <div class="job">
+
+                <div class="job-header">
+
+                    <span class="company">
+                        {{ job.company }}
+                    </span>
+
+                    <span class="dates">
+                        {{ job.dates }}
+                    </span>
+
+                </div>
+
+                <ul>
+                    {% for item in job.responsibilities %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
             {% endfor %}
-        </ul>
+
+        </section>
+
+        <section class="section">
+
+            <div class="section-title">
+                Education
+            </div>
+
+            <div class="divider"></div>
+
+            {% for edu in education %}
+
+            <div class="education-item">
+
+                <div class="degree">
+                    {{ edu.degree }}
+                </div>
+
+                <div class="education-info">
+                    {{ edu.institution }} &middot; {{ edu.status }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </section>
+
     </div>
-    {% endfor %}
-</section>
-
-<section class="section">
-    <div class="section-title">Educación</div>
-    <div class="divider"></div>
-
-    {% for edu in education %}
-    <div class="education-item">
-        <div class="degree">
-            {{ edu.degree }}
-        </div>
-
-        <div>
-            {{ edu.institution }} &middot; {{ edu.status }}
-        </div>
-    </div>
-    {% endfor %}
-</section>
-
-</div>
 
 </body>
+
 </html>

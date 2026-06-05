@@ -1,15 +1,16 @@
-import requests
-import json
 import os
+import json
 import requests
-from dotenv import load_dotenv
+from callAI import callAI
 
-load_dotenv()
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-def extractInfo(job_description: str) -> None: 
-    prompt = f"""You are an expert HR analyst. Extract the following information from the given job description.
+def _build_prompt(job_description: str) -> str:
+    """
+    Construye el prompt que será enviado al modelo de IA para extraer la información
+    requerida del *job_description*.
+    """
+    return f"""You are an expert HR analyst. Extract the following information from the given job description.
         Return ONLY a JSON object with these keys in English:
         title, seniority, required_skills, domains, soft_skills, experience_years.
         If a field is not mentioned, use an empty list (for list fields) or an empty string (for title/seniority) or 0 (for experience_years).
@@ -19,101 +20,102 @@ def extractInfo(job_description: str) -> None:
         \"\"\"
         """
 
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": "openai/gpt-oss-20b:free",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        }
-    )
-    result = response.json()
-    # print(result)
 
-    print(result["choices"][0]["message"]["content"])
+def extractInfo(job_description: str) -> None:
+    """
+    Función pública que recibe la descripción del puesto, genera el prompt,
+    llama a la IA y muestra por pantalla el JSON resultante.
+    """
+    prompt = _build_prompt(job_description)
+    try:
+        ai_response = callAI(prompt)
+        # Se asume que la respuesta es un JSON válido; si no lo es, se captura la excepción.
+        parsed = json.loads(ai_response)
+        print(json.dumps(parsed, ensure_ascii=False, indent=2))
+    except Exception as e:
+        # En caso de error, se muestra la respuesta cruda para depuración.
+        print(f"Error al procesar la respuesta de la IA: {e}")
+        print("Respuesta original:")
+        print(ai_response if 'ai_response' in locals() else "")
 
-extractInfo("""Descripción completa del empleo
-Practicante de Desarrollo de Software
 
-Modalidad 100% Home Office | Periodo de prácticas: 6 meses
+if __name__ == "__main__":
+    # Ejemplo rápido de uso desde la línea de comandos
+    example_description = """Descripción completa del empleo
+        Practicante de Desarrollo de Software
 
-Organización
+        Modalidad 100% Home Office | Periodo de prácticas: 6 meses
 
-Union Law Group
+        Organización
 
-Acompañamiento
+        Union Law Group
 
-Trabajo conjunto con la Gerente de Procesos y un Ingeniero de Software.
+        Acompañamiento
 
-Apoyo económico
+        Trabajo conjunto con la Gerente de Procesos y un Ingeniero de Software.
 
-Abiertos a ofrecer un apoyo económico acorde a experiencia, conocimientos y disponibilidad.
+        Apoyo económico
 
-Objetivo del puesto
+        Abiertos a ofrecer un apoyo económico acorde a experiencia, conocimientos y disponibilidad.
 
-Apoyar en el desarrollo de aplicaciones internas, automatizaciones, herramientas tipo CRM, bots, agentes conversacionales y soluciones tecnológicas que ayuden a mejorar la operación, comunicación y seguimiento de procesos dentro de Union Law Group.
+        Objetivo del puesto
 
-El practicante participará en proyectos reales enfocados en crear herramientas propias para la firma, optimizar procesos internos y automatizar tareas operativas, trabajando un proyecto a la vez bajo acompañamiento técnico y del área de Procesos.
+        Apoyar en el desarrollo de aplicaciones internas, automatizaciones, herramientas tipo CRM, bots, agentes conversacionales y soluciones tecnológicas que ayuden a mejorar la operación, comunicación y seguimiento de procesos dentro de Union Law Group.
 
-Principales actividades
+        El practicante participará en proyectos reales enfocados en crear herramientas propias para la firma, optimizar procesos internos y automatizar tareas operativas, trabajando un proyecto a la vez bajo acompañamiento técnico y del área de Procesos.
 
-Apoyar en el desarrollo de aplicaciones internas para uso operativo de la firma.
-Participar en el diseño y mejora de herramientas tipo CRM para seguimiento de clientes, casos, tareas o procesos internos.
-Apoyar en la creación de bots, agentes conversacionales o automatizaciones para mejorar la comunicación por WhatsApp, teléfono u otros canales digitales.
-Colaborar en proyectos de automatización de procesos administrativos, operativos y de atención al cliente.
-Apoyar en el desarrollo de soluciones que permitan reducir procesos manuales y mejorar el seguimiento de información.
-Participar en la integración de APIs, bases de datos, flujos digitales y herramientas internas.
-Realizar pruebas, detección de errores, documentación básica y seguimiento de avances.
-Trabajar con la Gerente de Procesos para comprender necesidades operativas y convertirlas en soluciones funcionales.
-Colaborar con el Ingeniero de Software para aprender, desarrollar y dar continuidad a proyectos tecnológicos existentes.
-Trabajar bajo un esquema ordenado, atendiendo un proyecto tecnológico a la vez, con objetivos, entregables y seguimiento definido.
-Perfil requerido
+        Principales actividades
 
-Estudiante activo de Ingeniería en Software, Sistemas Computacionales, Tecnologías de la Información, Ciencias de la Computación o carrera afín.
-Interés en desarrollo de aplicaciones, automatización de procesos, CRM, bots, agentes conversacionales y soluciones internas.
-Conocimientos básicos o intermedios en alguno de los siguientes lenguajes o herramientas: JavaScript, Python, C#, Java o similares.
-Conocimientos deseables en desarrollo web, APIs, bases de datos SQL, Git/GitHub, automatización o integración de herramientas digitales.
-Interés en crear soluciones funcionales para procesos reales de negocio.
-Capacidad de análisis y resolución de problemas.
-Organización, responsabilidad y autonomía para trabajar bajo modalidad remota.
-Buena comunicación, disposición para aprender y apertura a la retroalimentación.
-Competencias deseables
+        Apoyar en el desarrollo de aplicaciones internas para uso operativo de la firma.
+        Participar en el diseño y mejora de herramientas tipo CRM para seguimiento de clientes, casos, tareas o procesos internos.
+        Apoyar en la creación de bots, agentes conversacionales o automatizaciones para mejorar la comunicación por WhatsApp, teléfono u otros canales digitales.
+        Colaborar en proyectos de automatización de procesos administrativos, operativos y de atención al cliente.
+        Apoyar en el desarrollo de soluciones que permitan reducir procesos manuales y mejorar el seguimiento de información.
+        Participar en la integración de APIs, bases de datos, flujos digitales y herramientas internas.
+        Realizar pruebas, detección de errores, documentación básica y seguimiento de avances.
+        Trabajar con la Gerente de Procesos para comprender necesidades operativas y convertirlas en soluciones funcionales.
+        Colaborar con el Ingeniero de Software para aprender, desarrollar y dar continuidad a proyectos tecnológicos existentes.
+        Trabajar bajo un esquema ordenado, atendiendo un proyecto tecnológico a la vez, con objetivos, entregables y seguimiento definido.
+        Perfil requerido
 
-Pensamiento lógico y enfoque a soluciones.
-Proactividad y curiosidad tecnológica.
-Interés por desarrollar aplicaciones internas y herramientas propias.
-Atención al detalle.
-Capacidad para entender procesos operativos y traducirlos en soluciones tecnológicas.
-Organización para trabajar por proyectos, con avances y entregables definidos.
-Trabajo en equipo con áreas técnicas y operativas.
-Apertura para aprender sobre procesos legales, atención a clientes y operación interna.
-Condiciones de la práctica
+        Estudiante activo de Ingeniería en Software, Sistemas Computacionales, Tecnologías de la Información, Ciencias de la Computación o carrera afín.
+        Interés en desarrollo de aplicaciones, automatización de procesos, CRM, bots, agentes conversacionales y soluciones internas.
+        Conocimientos básicos o intermedios en alguno de los siguientes lenguajes o herramientas: JavaScript, Python, C#, Java o similares.
+        Conocimientos deseables en desarrollo web, APIs, bases de datos SQL, Git/GitHub, automatización o integración de herramientas digitales.
+        Interés en crear soluciones funcionales para procesos reales de negocio.
+        Capacidad de análisis y resolución de problemas.
+        Organización, responsabilidad y autonomía para trabajar bajo modalidad remota.
+        Buena comunicación, disposición para aprender y apertura a la retroalimentación.
+        Competencias deseables
 
-El practicante participará en proyectos reales de transformación tecnológica dentro de una firma de servicios legales con operación en México y Estados Unidos.
+        Pensamiento lógico y enfoque a soluciones.
+        Proactividad y curiosidad tecnológica.
+        Interés por desarrollar aplicaciones internas y herramientas propias.
+        Atención al detalle.
+        Capacidad para entender procesos operativos y traducirlos en soluciones tecnológicas.
+        Organización para trabajar por proyectos, con avances y entregables definidos.
+        Trabajo en equipo con áreas técnicas y operativas.
+        Apertura para aprender sobre procesos legales, atención a clientes y operación interna.
+        Condiciones de la práctica
 
-El objetivo es que adquiera experiencia aplicada en el desarrollo de aplicaciones internas, herramientas tipo CRM, bots, automatización de procesos y soluciones tecnológicas para mejorar la operación diaria de la firma.
+        El practicante participará en proyectos reales de transformación tecnológica dentro de una firma de servicios legales con operación en México y Estados Unidos.
 
-Beneficios
+        El objetivo es que adquiera experiencia aplicada en el desarrollo de aplicaciones internas, herramientas tipo CRM, bots, automatización de procesos y soluciones tecnológicas para mejorar la operación diaria de la firma.
 
-Modalidad 100% home office.
-Horarios flexibles.
-Participación en proyectos reales.
-Acompañamiento de una Gerente de Procesos y un Ingeniero de Software.
-Oportunidad de aprendizaje en desarrollo de soluciones aplicadas a negocio.
-Posibilidad de continuidad o contrato indefinido de acuerdo con desempeño, resultados y necesidades de la firma.
-Programa de referidos.
-Sueldo: $8,000.00 - $10,000.00 al mes
+        Beneficios
 
-Beneficios:
+        Modalidad 100% home office.
+        Horarios flexibles.
+        Participación en proyectos reales.
+        Acompañamiento de una Gerente de Procesos y un Ingeniero de Software.
+        Oportunidad de aprendizaje en desarrollo de soluciones aplicadas a negocio.
+        Posibilidad de continuidad o contrato indefinido de acuerdo con desempeño, resultados y necesidades de la firma.
+        Programa de referidos.
+        Sueldo: $8,000.00 - $10,000.00 al mes
 
-Horarios flexibles
-Opción a contrato indefinido
-Programa de referidos""")
+        Beneficios:
+
+        Horarios flexibles
+        Opción a contrato indefinido
+        Programa de referidos"""
+    extractInfo(example_description)

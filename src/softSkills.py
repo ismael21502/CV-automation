@@ -1,34 +1,29 @@
 import json 
-with open('src/data.json', 'r', encoding='utf-8') as file:
-    personalData = json.load(file)
+from callAI import callAI
 
-job_description = {
-  "title": "Practicante de Desarrollo de Software",
-  "seniority": "Intern",
-  "required_skills": [
-    "JavaScript",
-    "Python",
-    "C#",
-    "Java",
-    "Web Development",
-    "API Development",
-    "SQL Databases",
-    "Git/GitHub",
-    "Automation",
-    "Digital Tool Integration"
-  ],
-  "domains": [
-    "Internal Applications",
-    "CRM",
-    "Chatbots",
-    "Process Automation"
-  ],
-  "languages": [
-    "JavaScript",
-    "Python",
-    "C#",
-    "Java"
-  ],
-  "experience_years": 0
-}
+def selectSoftSkills(jobSoftSkills, softSkills):
+    prompt = f"""
+        You are an HR and recruiting expert.
+
+        Given a list of job soft skills and a list of candidate soft skills, select the candidate soft skills that best match the job requirements.
+
+        Consider semantic similarity, not only exact matches.
+        For example:
+        - Initiative is similar to Proactivity.
+        - Analytical Thinking is similar to Problem Solving.
+        - Self-directed Work is similar to Autonomy.
+
+        Rules:
+        - Select at most 3-4 candidate soft skills.
+        - Prefer the strongest matches.
+        - Do not invent new skills.
+        - Return ONLY a JSON array of strings.
+
+        Job soft skills:
+        {jobSoftSkills}
+
+        Candidate soft skills:
+        {softSkills}
+        """
+    return callAI(prompt)
 

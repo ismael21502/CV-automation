@@ -18,78 +18,54 @@ def canonical(skill):
     skill = normalize(skill)
     return ALIASES.get(skill, skill)
 
-with open('src/data.json', 'r', encoding='utf-8') as file:
-    personalData = json.load(file)
-
-job_description = {
+jobDescription = {
   "title": "Practicante de Desarrollo de Software",
-  "seniority": "Intern",
+  "seniority": "",
   "required_skills": [
     "JavaScript",
     "Python",
     "C#",
     "Java",
-    "Web Development",
-    "API Development",
-    "SQL Databases",
+    "web development",
+    "APIs",
+    "SQL databases",
     "Git/GitHub",
-    "Automation",
-    "Digital Tool Integration"
+    "Automation tools"
   ],
   "domains": [
-    "Internal Applications",
+    "Software Development",
+    "Automation",
     "CRM",
-    "Chatbots",
-    "Process Automation"
+    "Conversational Agents",
+    "Legal Services"
   ],
-  "languages": [
-    "JavaScript",
-    "Python",
-    "C#",
-    "Java"
+  "soft_skills": [
+    "analysis",
+    "problem solving",
+    "organization",
+    "responsibility",
+    "autonomy",
+    "communication",
+    "teamwork",
+    "proactivity",
+    "curiosity",
+    "attention to detail",
+    "openness to learning"
   ],
   "experience_years": 0
 }
 
-print("Required:", job_description["required_skills"])
+def getMatchedSkills(jobDescription, hardSkills):
+    # Normalizar skills de la vacante una sola vez
+    jobSkills = {
+        canonical(skill)
+        for skill in jobDescription["required_skills"]
+    }
+    matchedSkills = []
+    for skill in hardSkills:
+        mySkill = canonical(skill)
+        if mySkill in jobSkills:
+            matchedSkills.append(skill)
+    afinityPercentage = round(len(matchedSkills)/len(jobSkills)*100)
 
-# Normalizar skills de la vacante una sola vez
-job_skills = {
-    canonical(skill)
-    for skill in job_description["required_skills"]
-}
-print("SKILLS: ", job_skills)
-print("\nResultados:\n")
-
-matchedSkills = []
-for skill in personalData["Hard Skills"]:
-    my_skill = canonical(skill)
-    if my_skill in job_skills:
-        print(f"✅ Match: {skill}")
-        matchedSkills.append(skill)
-    else:
-        print(f"❌ No match: {skill}")
-
-print(f"Porcentaje de skills matcheadas: {round(len(matchedSkills)/len(job_skills)*100)}% ")
-
-# matchedDesiredSkills = []
-
-# for skill in personalData["Hard Skills"]:
-#     my_skill = canonical(skill)
-#     if my_skill in job_desired_skills:
-#         print(f"✅ Match: {skill}")
-#         matchedDesiredSkills.append(skill)
-#     else:
-#         print(f"❌ No match: {skill}")
-
-# print(f"Porcentaje de skills desired matcheadas: {round(len(matchedDesiredSkills)/len(job_desired_skills)*100)}% ")
-relevantData = {
-    "candidate": {
-    "experience_level": "Entry level",
-    "hard_skills": [...],
-    "soft_skills": [...]
-  },
-}
-
-print("Datos para la IA")
-print("Skills matcheadas: ", matchedSkills)
+    return afinityPercentage, matchedSkills
