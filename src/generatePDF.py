@@ -38,27 +38,19 @@ except ImportError as e:
 # una base de datos, de la salida de otro script, etc.
 # --------------------------------------------------------------------------- #
 candidateData = {
-    "name": "Ismael Hernandez",
+    "name": "Juan Pérez",
     # "title": "Desarrollador Full Stack",
     # "location": "Guadalajara, Jalisco",
-    "phone": "+52 33 14 16 17 81",
-    "email": "ismael21502@gmail.com",
-    "github": "https://github.com/ismael21502",
-    "profile": """Robotics Engineering student
-        with hands-on experience in
-        software 
-        development,
-        backend/frontend applications,
-        and system integration. Strong
-        foundation in object-oriented
-        programming, algorithms, and
-        problem-solving""",
+    "phone": "+55 334548712",
+    "email": "aaaaa@gmail.com",
+    "github": "https://github.com/aaaaaa",
+    "profile": "",
     "skills": ['Git', 'Github', 'Python', 'JavaScript', 'SQL', 'APIs', 'Web development'],
     "softSkills": ["Problem-solving", "Proactivity", "Responsibility", "Curiosity"],
     "experience": [
         {
-            "company": "Robotic Control and Simulation Platform",
-            "responsibilities": [
+            "title": "Robotic Control and Simulation Platform",
+            "bullets": [
                 "Developed a robotics control platform integrating React, Python, ESP32 hardware, and real-time WebSocket communication.",
                 "Implemented generalized forward and inverse kinematics algorithms for configurable serial manipulators.",
                 "Created interactive 3D visualization tools using Three.js and React Three Fiber to monitor robot state and coordinate systems.",
@@ -66,8 +58,8 @@ candidateData = {
             ]
             },
         {
-            "company": "Boat Rental Management System",
-            "responsibilities": [
+            "title": "Boat Rental Management System",
+            "bullets": [
                 "Developed a web application to manage boat rental operations, fleet information, and payment records.",
                 "Designed and implemented CRUD workflows for maintaining operational and business data through an intuitive user interface.",
                 "Delivered an MVP adopted in a real business environment and refined features based on operational feedback."
@@ -76,9 +68,9 @@ candidateData = {
     ],
     "education": [
         {
-            "degree": "B.Sc. Robotics Engineering",
-            "institution": "Universidad de Guadalajara",
-            "status": "En curso"
+            "degree": "",
+            "institution": "",
+            "status": ""
         }
     ]
 }

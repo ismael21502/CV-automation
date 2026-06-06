@@ -82,38 +82,6 @@
             ]
         },
         {
-            "name": "Fallout Kanban",
-            "summary": "Full-stack web-based Kanban board inspired by the Fallout franchise. The application combines task management functionality with a custom post-apocalyptic user interface, providing an engaging productivity experience while demonstrating full-stack development skills.",
-            "technologies": [
-                "React",
-                "Django",
-                "PostgreSQL",
-                "Railway",
-                "JavaScript",
-                "HTML",
-                "CSS"
-            ],
-            "facts": [
-                "Developed a full-stack web application using React and Django.",
-                "Designed and implemented a Kanban-style task management system.",
-                "Built CRUD functionality for creating, updating, organizing, and deleting tasks.",
-                "Integrated a PostgreSQL database for persistent task storage.",
-                "Deployed the application using Railway.",
-                "Designed a custom user interface inspired by the Fallout franchise and Pip-Boy aesthetic.",
-                "Created a cohesive visual identity through custom typography, color palettes, and interface components.",
-                "Developed both frontend and backend components of the application."
-            ],
-            "domains": [
-                "software-development",
-                "full-stack",
-                "frontend",
-                "backend",
-                "web-development",
-                "ui-design",
-                "productivity"
-            ]
-        },
-        {
             "name": "Boat Rental Management System",
             "summary": "Business management application designed to support the daily operations of a boat rental company. The system centralizes rental records, customer information, and operational workflows through an intuitive interface optimized for real-world usage.",
             "technologies": [

@@ -117,7 +117,7 @@
             margin-bottom: 6px;
         }
 
-        .company {
+        .job-title {
             font-size: 12pt;
             font-weight: 700;
             color: #111;
@@ -248,8 +248,8 @@
 
                 <div class="job-header">
 
-                    <span class="company">
-                        {{ job.company }}
+                    <span class="job-title">
+                        {{ job.title }}
                     </span>
 
                     <span class="dates">
@@ -259,7 +259,7 @@
                 </div>
 
                 <ul>
-                    {% for item in job.responsibilities %}
+                    {% for item in job.bullets %}
                     <li>{{ item }}</li>
                     {% endfor %}
                 </ul>
