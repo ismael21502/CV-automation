@@ -64,7 +64,7 @@ def callAI(prompt: str) -> str:
         obtiene una respuesta válida, se devuelve un mensaje de error amigable.
     """
     payload = {
-        "model": "openai/gpt-oss-20b:free",   # Ajusta el modelo según tu suscripción
+        "model": "openai/gpt-oss-120b:free",   # Ajusta el modelo según tu suscripción
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.7,
     }

@@ -234,7 +234,22 @@
             </div>
 
         </section>
+        <section class="section">
 
+            <div class="section-title">
+                Languages
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="soft-skills">
+                {% for language in languages %}
+                {{ language.name }}{% if language.level %} ({{ language.level }}){% endif %}
+                {% if not loop.last %} • {% endif %}
+                {% endfor %}
+            </div>
+
+        </section>
         <section class="section">
 
             <div class="section-title">

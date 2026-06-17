@@ -11,6 +11,9 @@
         "Arduino/Esp32",
         "Electronics",
         "HTML",
+        "HTML5",
+        "CSS3",
+        "Tailwind",
         "Robotics",
         "SQL",
         "ML",
@@ -33,7 +36,7 @@
         {"English": "B2"}
 
     ],
-    "Proyects": [
+    "Projects": [
         {
             "name": "Robotic Control and Simulation Platform",
             "summary": "Web-based application for visualizing, simulating, and controlling robotic manipulators through both joint-space and Cartesian-space control. The system integrates a React frontend, a Python backend implementing forward and inverse kinematics, interactive 3D visualization, and real-time communication with ESP32-based hardware.",

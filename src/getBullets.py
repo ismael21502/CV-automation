@@ -153,7 +153,7 @@ def selectProjectBullets(jobDescription, projects):
         prompt = f"""
         You are an experienced technical recruiter.
 
-        Select the 4 most relevant resume bullets for the target position.
+        Select the 4 most relevant resume bullets for the target position. Minimum 2
 
         Prioritize:
         - Required skills
