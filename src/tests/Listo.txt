@@ -1,0 +1,16 @@
+Bullets*
+SelectSoftSkills*
+ParseJob*
+
+
+Datos necesarios:
+name **
+phone **
+email **
+github **
+profile/summary *
+skills **
+soft-skills **
+experience -
+education **
+languages **

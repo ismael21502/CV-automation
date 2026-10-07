@@ -1,35 +1,123 @@
-{
-    "Hard Skills": [
-        "Git",
-        "Github",
-        "Python",
-        "C",
-        "JavaScript",
-        "React",
-        "TailwindCSS",
-        "CSS",
-        "Arduino/Esp32",
-        "Electronics",
-        "HTML",
-        "CSS",
-        "Robotics",
-        "SQL (basic)",
-        "APIs"
-    ],
-    "Soft Skills": [
-        "Problem-solving",
-        "Proactivity",
-        "Responsibility",
-        "Versatility",
-        "Curiosity",
-        "Pragmatism"
-    ],
-    "Languages": [
-        {"Spanish": "C2"},
-        {"English": "B2"}
+import json
+# from callAI import askAI
+from extractData.llm import bulletSelectorModel
+from pydantic import BaseModel
 
-    ],
-    "Projects": [
+class Result(BaseModel):
+    selectedBullets: list[int]
+
+def selectProjectBullets(jobData, projects): #TODO: projects debería ser una lista reducida, no todos los proyectos
+    """
+    Selecciona las 4 bullets más relevantes para cada proyecto.
+    Parámetros:
+        jobData (dict): JSON completo de la vacante.
+        projects (list): Lista de proyectos.
+    Devuelve:
+        list: [
+            {
+                "name": "...",
+                "bullets": [...]
+            }
+        ]
+    """
+    result = []
+    reduced_job = {
+        "title": jobData.get("title", ""),
+        "required_skills": jobData.get("required_skills", []),
+        "domains": jobData.get("domains", [])
+    }
+    for project in projects:
+        reduced_project = {
+            "name": project["name"],
+            "facts": project["facts"]
+        }
+        prompt = f"""
+        You are an experienced technical recruiter.
+        Select the 4 most relevant resume bullets for the target position. Minimum 2
+        Prioritize:
+        - Required skills
+        - Relevant domains
+        - Business value
+        - Technical complexity
+        Do not rewrite bullets.
+        Do not invent information.
+        Return ONLY valid JSON with the bullet indexes:
+        {{
+            "selected_bullets": []
+        }}
+        Job:
+        {json.dumps(reduced_job, indent=2)}
+        Project:
+        {json.dumps(reduced_project, indent=2)}
+        """
+        try:
+            # response = askAI("fast", prompt)
+            # data = json.loads(response)
+            # selected = {
+            #     "name": project["name"],
+            #     "bullets": data.get("selected_bullets", [])
+            # }
+            structuredModel = bulletSelectorModel.with_structured_output(Result)
+            response = structuredModel.invoke(prompt)
+            # response = response.model_dump()
+            selected = {
+                "name": project["name"],
+                "bullets": response.selectedBullets
+            }
+            result.append(selected)
+        except Exception as e:
+            print(
+                f"Error selecting bullets for "
+                f"{project['name']}: {e}"
+            )
+            result.append({
+                "name": project["name"],
+                "bullets": project["facts"][:4]
+            })
+    return result
+
+# selectProjectBullets(jobData,projectData)
+
+if __name__ == "__main__":
+    import time
+    start = time.perf_counter()
+    jobData = {
+        "title": "Practicante de Desarrollo de Software",
+        "seniority": "",
+        "required_skills": [
+            "JavaScript",
+            "Python",
+            "C#",
+            "Java",
+            "web development",
+            "APIs",
+            "SQL databases",
+            "Git/GitHub",
+            "automation tools"
+        ],
+        "domains": [
+            "Software Development",
+            "Automation",
+            "CRM",
+            "Conversational Agents",
+            "Legal Services"
+        ],
+        "soft_skills": [
+            "analysis",
+            "problem solving",
+            "organization",
+            "responsibility",
+            "autonomy",
+            "communication",
+            "teamwork",
+            "proactivity",
+            "curiosity",
+            "attention to detail",
+            "openness to learning"
+        ],
+        "experience_years": 0
+    }
+    projectData = [
         {
             "name": "Robotic Control and Simulation Platform",
             "summary": "Web-based application for visualizing, simulating, and controlling robotic manipulators through both joint-space and Cartesian-space control. The system integrates a React frontend, a Python backend implementing forward and inverse kinematics, interactive 3D visualization, and real-time communication with ESP32-based hardware.",
@@ -76,8 +164,7 @@
                 "simulation",
                 "automation"
             ]
-        },
-        {
+        },{
             "name": "Boat Rental Management System",
             "summary": "Business management application designed to support the daily operations of a boat rental company. The system centralizes rental records, customer information, and operational workflows through an intuitive interface optimized for real-world usage.",
             "technologies": [
@@ -110,4 +197,18 @@
             ]
         }
     ]
-}
+    result = selectProjectBullets(jobData, projectData)
+    print("\n=== SELECTED PROJECT BULLETS ===\n")
+    print(
+        json.dumps(
+            result,
+            indent=4,
+            ensure_ascii=False
+        )
+    )
+    # print(projectData["Robotic Control and Simulation Platform"])
+    for project in projectData:
+        for bullet in result[0]["bullets"]:
+            print(project["facts"][bullet])
+    end = time.perf_counter()
+    print(f"La tarea tomó {end-start:.2f}s")

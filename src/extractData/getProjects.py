@@ -1,5 +1,4 @@
-import json
-from callAI import callAI
+from callAI import askAI
 
 jobDescription = {
   "title": "Practicante de Desarrollo de Software",
@@ -37,6 +36,54 @@ jobDescription = {
   ],
   "experience_years": 0
 }
+def selectProjects(relevantData: dict, projects): #RelevantData debería ser jobTitle, jobDomains, jobSkills
+    promptTemplate = """
+    # ROL
+    Eres un validador de candidatos estricto. Tu función es verificar si las tecnologías del proyecto coinciden EXACTAMENTE con las requeridas en la vacante.
+
+    # INSTRUCCIONES DE PROCESAMIENTO
+    1. Analiza el campo 'job_skills' como una lista cerrada (Whitelist).
+    2. Busca coincidencias de substrings exactos entre las skills del proyecto y la whitelist de la vacante.
+    3. DESCARTA cualquier tecnología mencionada en el proyecto que NO esté explícitamente en 'job_skills'.
+
+    # REGLAS DE NEGACIÓN
+    - NUNCA inventes habilidades.
+    - Si la vacante pide ['Python', 'Docker'], y el proyecto usa ['threejs', 'React'], la lista de skills_covered debe ser vacía [] porque ninguno coincide exactamente con la whitelist (a menos que 'React' esté en job_skills).
+    - Ignora habilidades implícitas o relacionadas.
+
+    # EJEMPLO DE CORRECTO (Few-Shot)
+    Vacante Skills: ["Python", "Docker", "APIs"]
+    Proyecto Usos: ["threejs", "React", "Python"]
+    Salida Esperada: {{"project_title": "...", "skills_covered": ["Python"]}}
+
+    Ejemplo de INCORRECTO (No hagas esto):
+    {{"project_title": "...", "skills_covered": ["Python", "Docker", "React"]}} <-- Error por incluir React si no estaba en la lista vacante.
+
+    # FORMATO DE SALIDA
+    Retornarás ÚNICAMENTE un JSON válido, sin markdown ni comentarios.
+    Estructura: {{"project_title": "", "skills_covered": []}}
+
+    INPUT VACANTE: {jobInfo}
+    INPUT PROYECTO: {projects}
+    """
+
+    projectsData = [{
+        'name': project["name"],
+        'summary': project["summary"],
+        'technologies': project["technologies"],
+        'domains': project["domains"]
+    } for project in projects]
+    # print("INPUT: ", promptTemplate.format(jobInfo=relevantData, projects=projectData))
+    for i in range(len(projectData)):
+        print("Respuesta IA: ", askAI("bigger", promptTemplate.format(jobInfo=relevantData, projects=projectsData[i])))
+    # print("Project summaries: ", [project["summary"] for project in projects])
+
+relevantData = {
+    "job_title": jobDescription["title"],
+    "job_domains": jobDescription["domains"],
+    "job_skills": jobDescription["required_skills"]
+}
+
 projectData = [
     {
         "name": "Robotic Control and Simulation Platform",
@@ -115,102 +162,55 @@ projectData = [
             "data-management",
             "user-experience"
         ]
-    }
+    },
+    {
+            "name": "Fallout Kanban",
+            "summary": "Full-stack web-based Kanban board inspired by the Fallout franchise. The application combines task management functionality with a custom post-apocalyptic user interface, providing an engaging productivity experience while demonstrating full-stack development skills.",
+            "technologies": [
+                "React",
+                "Django",
+                "PostgreSQL",
+                "Railway",
+                "JavaScript",
+                "HTML",
+                "CSS"
+            ],
+            "facts": [
+                "Developed a full-stack web application using React and Django.",
+                "Designed and implemented a Kanban-style task management system.",
+                "Built CRUD functionality for creating, updating, organizing, and deleting tasks.",
+                "Integrated a PostgreSQL database for persistent task storage.",
+                "Deployed the application using Railway.",
+                "Designed a custom user interface inspired by the Fallout franchise and Pip-Boy aesthetic.",
+                "Created a cohesive visual identity through custom typography, color palettes, and interface components.",
+                "Developed both frontend and backend components of the application."
+            ],
+            "domains": [
+                "software-development",
+                "full-stack",
+                "frontend",
+                "backend",
+                "web-development",
+                "ui-design",
+                "productivity"
+            ]
+        },
+        {
+                    "name": "AI agent",
+                    "summary": "AI general agent made with local models and python",
+                    "technologies": [
+                        "Python",
+                        "LangChain",
+                        "LangGraph",
+                        "API consumption"
+                    ],
+                    "facts": [
+                        "Developed a python script that runs a general AI agent"
+                    ],
+                    "domains": [
+                        "software-development",
+                        "productivity"
+                    ]
+                }
 ]
-
-def selectProjectBullets(jobDescription, projects):
-    """
-    Selecciona las 4 bullets más relevantes para cada proyecto.
-
-    Parámetros:
-        jobDescription (dict): JSON completo de la vacante.
-        projects (list): Lista de proyectos.
-
-    Devuelve:
-        list: [
-            {
-                "name": "...",
-                "bullets": [...]
-            }
-        ]
-    """
-
-    result = []
-
-    reduced_job = {
-        "title": jobDescription.get("title", ""),
-        "required_skills": jobDescription.get("required_skills", []),
-        "domains": jobDescription.get("domains", [])
-    }
-
-    for project in projects:
-
-        reduced_project = {
-            "name": project["name"],
-            "facts": project["facts"]
-        }
-
-        prompt = f"""
-        You are an experienced technical recruiter.
-
-        Select the 4 most relevant resume bullets for the target position. Minimum 2
-
-        Prioritize:
-        - Required skills
-        - Relevant domains
-        - Business value
-        - Technical complexity
-
-        Do not rewrite bullets.
-        Do not invent information.
-
-        Return ONLY valid JSON:
-
-        {{
-            "selected_bullets": []
-        }}
-
-        Job:
-        {json.dumps(reduced_job, indent=2)}
-
-        Project:
-        {json.dumps(reduced_project, indent=2)}
-        """
-
-        try:
-            response = callAI(prompt)
-
-            data = json.loads(response)
-
-            selected = {
-                "name": project["name"],
-                "bullets": data.get("selected_bullets", [])
-            }
-
-            result.append(selected)
-
-        except Exception as e:
-
-            print(
-                f"Error selecting bullets for "
-                f"{project['name']}: {e}"
-            )
-
-            result.append({
-                "name": project["name"],
-                "bullets": project["facts"][:4]
-            })
-
-    print("\n=== SELECTED PROJECT BULLETS ===\n")
-
-    print(
-        json.dumps(
-            result,
-            indent=4,
-            ensure_ascii=False
-        )
-    )
-
-    return result
-
-selectProjectBullets(jobDescription,projectData)
+selectProjects(relevantData, projectData)

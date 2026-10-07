@@ -1,11 +1,11 @@
 import json
 import asyncio
-from softSkills import selectSoftSkills
-from matchedSkills import getMatchedSkills
-from callAI import callAI
-from getBullets import selectProjectBullets
+from extractData.getSoftSkills import selectSoftSkills
+from extractData.getMatchedSkills import getMatchedSkills
+from extractData.callAI import askAI
+from extractData.getBullets import selectProjectBullets
 from generatePDF import render_template, generate_pdf
-
+from extractData.llm import writeSummaryModel
 # --------------------------------------------------------------------------- #
 # Descripción del puesto (job description)
 # --------------------------------------------------------------------------- #
@@ -47,9 +47,7 @@ def getSummary(relevantData: dict) -> str:
     """
     prompt = f"""
         You are an expert resume writer.
-
         Using the candidate information below, write a concise professional summary for a resume.
-
         Requirements:
         - Maximum 35 words.
         - Professional tone.
@@ -71,16 +69,15 @@ def getSummary(relevantData: dict) -> str:
         Candidate data:
         {relevantData}
         """
-    summary = callAI(prompt)
+    # summary = askAI("bigger", prompt)
+    summary = writeSummaryModel.invoke(prompt).content
     # La API devuelve el texto con posibles saltos de línea; lo limpiamos.
     return summary.strip()
-
 
 def generateCV() -> dict:
     """
     Ejecuta todo el flujo de generación del CV y devuelve los datos
     necesarios para renderizar la plantilla HTML.
-
     Retorna un diccionario con:
         - hard_skills: lista de hard skills coincidentes
         - soft_skills: lista de soft skills seleccionadas
@@ -88,14 +85,14 @@ def generateCV() -> dict:
         - experience: lista de proyectos (bullets) seleccionados
     """
     # 1️⃣ Matching de hard skills
-    affinity, hardSkills = getMatchedSkills(jobDescription, personalData["Hard Skills"])
-    if affinity < 20:
-        print("No hay match suficiente entre el perfil y la oferta.")
-        return {}
+    hardSkills = getMatchedSkills(jobDescription["required_skills"], personalData["Hard Skills"])
+    # if affinity < 20:
+    #     print("No hay match suficiente entre el perfil y la oferta.")
+    #     return {}
 
     # 2️⃣ Selección de soft skills
     softSkills = selectSoftSkills(jobDescription["soft_skills"], personalData["Soft Skills"])
-    softSkills = json.loads(softSkills)
+    # softSkills = json.loads(softSkills)
     print("Soft skills", type(softSkills))
     # 3️⃣ Selección de proyectos (bullets)
     projects = selectProjectBullets(jobDescription, personalData["Projects"])
@@ -168,6 +165,7 @@ def main():
     ]
     }
 
+    print("DATA: ",json.dumps(candidateData, indent=4))
     # Ruta al template HTML (puede ser relativo al proyecto)
     template_path = "index.html"
     output_pdf = "cv.pdf"
@@ -180,4 +178,8 @@ def main():
 
 
 if __name__ == "__main__":
+    import time
+    start = time.perf_counter()
     main()
+    end = time.perf_counter()
+    print(f"La tarea tomó {end-start:.2f}")

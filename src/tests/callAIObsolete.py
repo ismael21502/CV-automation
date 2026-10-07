@@ -5,6 +5,7 @@ import random
 import requests
 from typing import Any, Dict
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Configuración básica
@@ -61,7 +62,7 @@ def callAI(prompt: str) -> str:
     -------
     str
         Texto de la respuesta de la IA. Si después de los reintentos no se
-        obtiene una respuesta válida, se devuelve un mensaje de error amigable.
+        obtiene una respuesta válida, se devuelve un mensaje de error.
     """
     payload = {
         "model": "openai/gpt-oss-120b:free",   # Ajusta el modelo según tu suscripción
@@ -115,3 +116,6 @@ def callAI(prompt: str) -> str:
 
     # Si se sale del bucle sin retornar, devolvemos un mensaje genérico
     return "No se pudo obtener una respuesta de la IA."
+
+
+print(callAI("Hola"))
