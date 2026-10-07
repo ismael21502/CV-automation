@@ -39,12 +39,7 @@ def selectProjectBullets(jobData, projects): #TODO: projects debería ser una li
         - Relevant domains
         - Business value
         - Technical complexity
-        Do not rewrite bullets.
         Do not invent information.
-        Return ONLY valid JSON with the bullet indexes:
-        {{
-            "selected_bullets": []
-        }}
         Job:
         {json.dumps(reduced_job, indent=2)}
         Project:
@@ -59,10 +54,15 @@ def selectProjectBullets(jobData, projects): #TODO: projects debería ser una li
             # }
             structuredModel = bulletSelectorModel.with_structured_output(Result)
             response = structuredModel.invoke(prompt)
+
+            # for bullet in response.selectedBullets:
+            #     print(project["facts"][bullet])
+            bullets = [project["facts"][bullet] for bullet in response.selectedBullets]
             # response = response.model_dump()
             selected = {
                 "name": project["name"],
-                "bullets": response.selectedBullets
+                # "bullets": response.selectedBullets
+                "bullets": bullets
             }
             result.append(selected)
         except Exception as e:
@@ -207,8 +207,8 @@ if __name__ == "__main__":
         )
     )
     # print(projectData["Robotic Control and Simulation Platform"])
-    for project in projectData:
-        for bullet in result[0]["bullets"]:
-            print(project["facts"][bullet])
+    # for project in projectData:
+    #     for bullet in result[0]["bullets"]:
+    #         print(project["facts"][bullet])
     end = time.perf_counter()
     print(f"La tarea tomó {end-start:.2f}s")

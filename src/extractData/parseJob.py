@@ -11,7 +11,7 @@ class JobData(BaseModel):
     soft_skills: list[str]
     experience_years: int
 
-def extractJobInfo(jobDescription: str) -> None:
+def extractJobInfo(jobDescription: str) -> dict:
     prompt = f"""You are an expert HR analyst. Extract the following information from the given job description.
         Return ONLY a JSON object with these keys in English:
         title, seniority, required_skills, domains, soft_skills, experience_years.
@@ -32,7 +32,7 @@ def extractJobInfo(jobDescription: str) -> None:
         print(f"Error al procesar la respuesta de la IA: {e}")
         print("Respuesta original:")
         print(AIResponse if 'AIResponse' in locals() else "")
-
+        return {}
 
 if __name__ == "__main__":
     import time
