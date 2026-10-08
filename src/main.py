@@ -7,6 +7,7 @@ from extractData.getBullets import selectProjectBullets
 from extractData.parseJob import extractJobInfo
 from generatePDF import render_template, generate_pdf
 from extractData.llm import writeSummaryModel
+from editData import editExperience, editSkills, editField
 import pyperclip
 
 # --------------------------------------------------------------------------- #
@@ -50,25 +51,23 @@ def getSummary(relevantData: dict) -> str:
     """
     prompt = f"""
         You are an expert resume writer.
-        Using the candidate information below, write a concise professional summary for a resume.
+        Write a concise professional summary for the candidate, tailored to the target position.
         Requirements:
-        - Maximum 35 words.
-        - Professional tone.
-        - Align the summary with the target position.
-        - Focus on the type of projects the candidate has built and the value they can bring.
-        - Highlight relevant domains, projects, and interests rather than listing technologies. Especially domains and interests.
-        - Mention technical skills only if they are essential to understanding the candidate's profile.
-        - Do not simply repeat items from the skills section.
-        - Do not invent experience, technologies, or achievements.
-        - Do not use first person ("I", "my").
-        - Return ONLY the summary text.
-        - Never mention domains that are only present in the job description.
-        - Only mention domains supported by the candidate's projects or experience.
-        - Write as an experienced human resume writer, not as an AI assistant.
-        - Avoid corporate buzzwords, clichés, and exaggerated language.
-        - Prefer clear and direct wording over sophisticated vocabulary.
-        - The summary should sound believable for an entry-level candidate.
-        - Do not use phrases such as "proven ability", "passionate professional", "results-driven", "dynamic professional", "highly motivated", or similar resume clichés.
+        * Maximum 35 words.
+        * Use a professional, clear, and natural tone.
+        * Adapt the summary to the target position by emphasizing the candidate's most relevant professional focus, capabilities, and areas of experience.
+        * Describe the candidate's profile at a high level rather than listing specific projects.
+        * Do not simply repeat the skills section.
+        * Mention specific technologies only when they meaningfully define the candidate's profile or are highly relevant to the position.
+        * Use only information supported by the candidate data. Do not invent experience, technologies, achievements, interests, or responsibilities.
+        * Do not imply professional experience that the candidate does not have.
+        * Do not use first person ("I", "my").
+        * Avoid corporate buzzwords, clichés, and exaggerated language.
+        * Avoid phrases such as "proven ability", "passionate professional", "results-driven", "dynamic professional", "highly motivated", or similar resume clichés.
+        * Prefer clear and direct wording over sophisticated vocabulary.
+        * The summary should sound believable for the candidate's experience level.
+        * Do not mention specific projects or skills unless they are highly relevant to the position.
+        * Return ONLY the summary text.
         Candidate data:
         {relevantData}
         """
@@ -87,7 +86,7 @@ def generateCV(jobDescription: str) -> dict:
         - summary:    texto del resumen profesional
         - experience: lista de proyectos (bullets) seleccionados
     """
-    jobData = extractJobInfo(jobDescription)
+    # jobData = extractJobInfo(jobDescription)
     # 1️⃣ Matching de hard skills
     # hardSkills = getMatchedSkills(jobData["required_skills"], personalData["Hard Skills"])
     hardSkills = getMatchedSkills(jobDescription, personalData["Hard Skills"])
@@ -97,35 +96,72 @@ def generateCV(jobDescription: str) -> dict:
     #     return {}
 
     # 2️⃣ Selección de soft skills
-    softSkills = selectSoftSkills(jobData["soft_skills"], personalData["Soft Skills"])
+    # softSkills = selectSoftSkills(jobData["soft_skills"], personalData["Soft Skills"])
+    softSkills = selectSoftSkills(jobDescription, personalData["Soft Skills"])
     # softSkills = json.loads(softSkills)
     print("Soft skills", softSkills, type(softSkills))
     # 3️⃣ Selección de proyectos (bullets)
-    projects = selectProjectBullets(jobData, personalData["Projects"])
+    projects = selectProjectBullets(jobDescription, personalData["Projects"])
 
     # 4️⃣ Construcción de los datos relevantes para el resumen
+    # relevantData = {
+    #     "candidate": {
+    #         "experience_level": "Entry level",
+    #         "hard_skills": hardSkills,
+    #         "soft_skills": softSkills
+    #     },
+    #     "job": {
+    #         "title": jobData["title"],
+    #         "domains": jobData["domains"],
+    #     },
+    #     "projects": projects
+    # }
     relevantData = {
         "candidate": {
             "experience_level": "Entry level",
             "hard_skills": hardSkills,
             "soft_skills": softSkills
         },
-        "job": {
-            "title": jobData["title"],
-            "domains": jobData["domains"],
-        },
+        "job_description": jobDescription,
         "projects": projects
     }
 
     # 5️⃣ Generación del resumen (profile)
     summary = getSummary(relevantData)
-
+    print("Summary: ", summary)
     # 6️⃣ Devolvemos todo lo necesario para la plantilla
+    # return {
+    #     "hard_skills": hardSkills,
+    #     "soft_skills": softSkills,
+    #     "summary": summary,
+    #     "experience": [{"title":project["name"], "bullets": project["bullets"]} for project in projects]
+    # }
     return {
-        "hard_skills": hardSkills,
-        "soft_skills": softSkills,
-        "summary": summary,
-        "experience": [{"title":project["name"], "bullets": project["bullets"]} for project in projects]
+        "name": "Ismael Hernandez",
+        "phone": "3314161781",
+        "email": "ismael21502@gmail.com",
+        "github": "https://github.com/ismael21502",
+        "profile": summary,          # resumen generado por IA
+        "skills": hardSkills,       # hard skills coincidentes
+        "softSkills": softSkills,   # soft skills seleccionadas
+        "experience": [{"title":project["name"], "bullets": project["bullets"]} for project in projects],     # proyectos seleccionados
+        "education": [
+            {
+                "degree": "B.Sc. Robotics Engineering",
+                "institution": "Universidad de Guadalajara",
+                "status": "In Progress"
+            }
+        ],
+        "languages": [
+        {
+            "name": "Spanish",
+            "level": "Native"
+        },
+        {
+            "name": "English",
+            "level": "B2"
+        }
+    ]
     }
 
 def getJobDescription():
@@ -146,84 +182,58 @@ def getJobDescription():
             return text
         # print("Copia nuevamente la descripción.")
 
-def main():
+def loadCVData() -> dict:
+    try:
+        with open("src/cv.json", "r") as file:
+            cvData = json.load(file)
+    except Exception as e:
+        print("No se pudo abrir el archivo ", e)
+        return None
+    return cvData
+
+def saveCVData(newData) -> bool:
+    try:
+        with open("src/cv.json", "w") as file:
+            json.dump(newData, file, indent=4)
+    except Exception as e:
+        print("No se pudo guardar el archivo ", e)
+        return False
+    return True
+def editCVData(cvData: dict):
     """
-    Punto de entrada del script.
-    Genera los datos del CV y luego crea el PDF llamando a generatePDF.py.
+    Permite al usuario editar un campo específico del CV.
     """
-    cv_data = generateCV("""
-    Becario de desarrollo de software
-    At Jabil (NYSE: JBL), we are proud to be a trusted partner for the world's top brands, offering comprehensive engineering, supply chain, and manufacturing solutions. With 60 years of experience across industries and a vast network of over 100 sites worldwide, Jabil combines global reach with local expertise to deliver both scalable and customized solutions. Our commitment extends beyond business success as we strive to build sustainable processes that minimize environmental impact and foster vibrant and diverse communities around the globe.
-    Job Summary
-    The Intern provides support for day-to-day activities within the assigned function while gaining practical experience in a professional workplace environment. The role focuses on learning standard operational processes, safety practices, and quality requirements while contributing to team and organizational efficiency.
-
-    Education & Experience
-    Currently pursuing or recently completed a diploma, undergraduate, or postgraduate program in a relevant field. Prior academic, project, or internship exposure is an advantage but not mandatory.
-
-    Responsibilities
-    Support daily activities and assigned tasks under supervision. Assist with documentation, coordination, data handling, and routine activities as required. Participate in learning standard processes, safety practices, and quality requirements. Contribute to project-related work and continuous improvement initiatives while following established policies and timelines.
-
-    Skills/ Ability Generic (High Level)
-    Strong willingness to learn and adapt in a professional environment. Basic organizational, analytical, and communication skills. Ability to follow instructions, manage time effectively, and maintain attention to detail. Capable of working independently as well as collaboratively within a team setting.
-
-    Leadership Capabilities (People Leader) "M" Career Stream
-    NA
-
-    TEN CUIDADO CON LOS FRAUDES: Las oportunidades laborales legítimas en Jabil se pueden encontrar en nuestro sitio web oficial Jabil.com. Ningun solicitante debe pagar para acceder a estas oportunidades de empleo. Al postularte para un empleo en Jabil, serás contactado a través del portal oficial de jabil por un correo electrónico con teminacion @jabil.com; llamada telefónica directa de un integrante del equipo de Jabil; o correo electrónico directo con una dirección de correo electrónico @jabil.com. Jabil no solicita pagos para realizar entrevistas ni en ningún otro momento durante el proceso de contratación. Jabil tampoco pedirá información personal de identificación como número de seguro social, acta de nacimiento, información de institución financiera, número de licencia de conducir o información de pasaporte por teléfono o correo electrónico. Si crees que estás siendo víctima de robo de identidad o fraude, repórtalo a la policía en los siguientes números y repórtala en el sitio web donde la encontraste. Llama a: 911 o 089.
-    Jabil, including its subsidiaries, is an equal opportunity employer and considers qualified applicants for employment without regard to race, color, religion, national origin, sex, sexual orientation, gender identity, age, disability, genetic information, veteran status, or any other characteristic protected by law.
-
-    Accessibility Accommodation
-    If you are a qualified individual with a disability, you have the right to request a reasonable accommodation if you are unable or limited in your ability to use or access Jabil.com/Careers site as a result of your disability. You can request a reasonable accommodation by sending an e-mail to Always_Accessible@Jabil.com with the nature of your request and contact information. Please do not direct any other general employment related questions to this e-mail. Please note that only those inquiries concerning a request for reasonable accommodation will be responded to.
-    """)
-    if not cv_data:
-        # No se pudo generar el CV (p.ej. affinity < 40)
-        return
-
-    # ------------------------------------------------------------------- #
-    # Construcción del contexto que será pasado a la plantilla Jinja2.
-    # Los campos que no provienen del proceso pueden quedar hardcodeados.
-    # ------------------------------------------------------------------- #
-    candidateData = {
-        "name": "Ismael Hernandez",
-        "phone": "3314161781",
-        "email": "ismael21502@gmail.com",
-        "github": "https://github.com/ismael21502",
-        "profile": cv_data["summary"],          # resumen generado por IA
-        "skills": cv_data["hard_skills"],       # hard skills coincidentes
-        "softSkills": cv_data["soft_skills"],   # soft skills seleccionadas
-        "experience": cv_data["experience"],     # proyectos seleccionados
-        "education": [
-            {
-                "degree": "B.Sc. Robotics Engineering",
-                "institution": "Universidad de Guadalajara",
-                "status": "In Progress"
-            }
-        ],
-        "languages": [
-        {
-            "name": "Spanish",
-            "level": "Native"
-        },
-        {
-            "name": "English",
-            "level": "B2"
-        }
-    ]
-    }
-
-    print("DATA: ",json.dumps(candidateData, indent=4))
-    # Ruta al template HTML (puede ser relativo al proyecto)
-    template_path = "index.html"
-    output_pdf = "cv.pdf"
-
-    # Renderizamos la plantilla con los datos del candidato
-    rendered_html = render_template(template_path, candidateData)
-
-    # Generamos el PDF a partir del HTML renderizado
-    asyncio.run(generate_pdf(rendered_html, output_pdf))
-
+    # field = input("Ingrese el nombre del campo a editar (profile, skills, softSkills, experience): ").strip()
+    field = input("""1. Name
+2. Phone number
+3. Email
+4. Github link
+5. Summary
+6. Hard skills
+7. Soft skills
+8. Experience/Projects
+Elige el campo a editar: """).strip()
+    if field == "1":
+        cvData = editField(cvData, "name", "nombre")
+    elif field == "2":
+        cvData = editField(cvData, "phone", "número de teléfono")
+    elif field == "3":
+        cvData = editField(cvData, "email", "email")
+    elif field == "4":
+        cvData = editField(cvData, "github", "link de Github")
+    elif field == "5":
+        cvData = editField(cvData, "profile", "summary")
+    elif field == "6":
+        cvData = editSkills(cvData, "skills", "Hard Skills")
+    elif field == "7":
+        cvData = editSkills(cvData, "softSkills", "Soft Skills")
+    elif field == "8":
+        cvData = editExperience(cvData, "experience", "Experience")
+    else:
+        print("Opción inválida")
+    return cvData
 if __name__ == "__main__":
-    cvData = {}
+    cvData = loadCVData()
     while True:
         if bool(cvData):
             print("Hay datos CV guardados")
@@ -232,6 +242,8 @@ if __name__ == "__main__":
         option = input("""1. Ver CV guardado
 2. Generar nuevo CV
 3. Generar PDF con los datos guardados
+4. Editar manualmente un campo del CV
+5. Salir
 Elige tu opción: """)
         import time
         start = time.perf_counter()
@@ -241,35 +253,7 @@ Elige tu opción: """)
             jobDescription = getJobDescription()
             if not jobDescription:
                 continue
-            llmData = generateCV(jobDescription)
-            if not llmData: continue
-            cvData = {
-                    "name": "Ismael Hernandez",
-                    "phone": "3314161781",
-                    "email": "ismael21502@gmail.com",
-                    "github": "https://github.com/ismael21502",
-                    "profile": llmData["summary"],          # resumen generado por IA
-                    "skills": llmData["hard_skills"],       # hard skills coincidentes
-                    "softSkills": llmData["soft_skills"],   # soft skills seleccionadas
-                    "experience": llmData["experience"],     # proyectos seleccionados
-                    "education": [
-                        {
-                            "degree": "B.Sc. Robotics Engineering",
-                            "institution": "Universidad de Guadalajara",
-                            "status": "In Progress"
-                        }
-                    ],
-                    "languages": [
-                    {
-                        "name": "Spanish",
-                        "level": "Native"
-                    },
-                    {
-                        "name": "English",
-                        "level": "B2"
-                    }
-                ]
-            }
+            cvData = generateCV(jobDescription)
         elif option == "3":
             templatePath = "index.html"
             outputPdf = "cv.pdf"
@@ -277,7 +261,15 @@ Elige tu opción: """)
             renderedHtml = render_template(templatePath, cvData)
             # Generamos el PDF a partir del HTML renderizado
             asyncio.run(generate_pdf(renderedHtml, outputPdf))
+        elif option == "4":
+            cvData = editCVData(cvData)
+            if saveCVData(cvData):
+                print("Datos guardados correctamente.")
+            else:
+                print("Error al guardar los datos.")
+        elif option == "5":
+            break
         else: 
             print("Opción inválida")
         end = time.perf_counter()
-        print(f"La tarea tomó {end-start:.2f}")
+        print(f"La tarea tomó {end-start:.2f}s")
